@@ -6,7 +6,7 @@
 #leftborder, #rightborder {
     top: 0;
     bottom: 0;
-    width: 15px;
+    width: 10px;
 }
 
 #leftborder {
@@ -20,7 +20,7 @@
 #topborder, #bottomborder {
     left: 0;
     right: 0;
-    height: 15px;
+    height: 10px;
 }
 
 #topborder {
@@ -39,3 +39,25 @@
 .GameBoard{
     background-color:lightgreen;
 }
+
+.Center {
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+button{
+    font-size:30px;
+    font-family:Arial;
+    background-color:darkgreen;
+    color:white;
+    height:100px;
+    width:200px;
+}
+
