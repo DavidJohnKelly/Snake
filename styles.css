@@ -1,0 +1,41 @@
+#topborder, #bottomborder, #leftborder, #rightborder {
+    background: #42C018;
+    position: fixed;
+}
+
+#leftborder, #rightborder {
+    top: 0;
+    bottom: 0;
+    width: 15px;
+}
+
+#leftborder {
+    left: 0;
+}
+
+#rightborder {
+    right: 0;
+}
+
+#topborder, #bottomborder {
+    left: 0;
+    right: 0;
+    height: 15px;
+}
+
+#topborder {
+    top: 0;
+}
+
+#bottomborder {
+    bottom: 0;
+}
+
+#Score {
+    text-align: center;
+    color: Black;
+}
+
+.GameBoard{
+    background-color:lightgreen;
+}
