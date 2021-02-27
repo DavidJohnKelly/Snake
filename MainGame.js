@@ -16,8 +16,12 @@ function GameStart() {
 function GameLoop() {
     
     //Movement();
-    Movement(); Movement(); Movement(); Movement(); Movement(); Movement(); Movement(); Movement(); Movement(); Movement(); Movement(); Movement(); Movement();
-
+    Movement(); Movement(); Movement(); Movement(); Movement();
+    AddSegment()
+    Movement(); Movement(); Movement();
+    AddSegment()
+    Movement(); Movement(); Movement();
+    AddSegment(); AddSegment();
         //sleep(100);
     
 }
@@ -37,13 +41,13 @@ function sleep(miliseconds) {
 
 function Movement() {
     var HeadPosition = Snake[0].getPosition();
-    Snake[0].setPosition(HeadPosition.x, HeadPosition.y + 46);
-    Snake[Snake.length - 1].setPosition(HeadPosition.x, HeadPosition.y);
-    Snake[Snake.length - 1].setType("body");
-    Snake.splice(1, 0, Snake[Snake.length - 1]);
-    Snake.splice(Snake.length - 1, 1);
+    Snake[0].setPosition(HeadPosition.x, HeadPosition.y + 46); // Increments the position of the head of the snake
+    Snake[Snake.length - 1].setPosition(HeadPosition.x, HeadPosition.y); // Moves the tail piece to where the head was
+    Snake[Snake.length - 1].setType("body"); // Alters the tail piece to become a body segment
+    Snake.splice(1, 0, Snake[Snake.length - 1]); // Adds the altered tail piece in the list between the head and first body connection
+    Snake.splice(Snake.length - 1, 1); // Deletes the initial tail piece from the list
 
-    Snake[Snake.length - 1].setType("tail");
+    Snake[Snake.length - 1].setType("tail"); // Alters the now final item in the list (body) to be a tail
 
 
 }
