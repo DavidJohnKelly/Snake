@@ -4,30 +4,68 @@ function GameStart() {
     var StartButton = document.getElementById("StartButton");
     StartButton.style.visibility = "hidden";
 
-    Snake[0] = new SnakeSegment("head", (document.documentElement.clientWidth) / 2, (document.documentElement.scrollHeight) / 2);
-    Snake[1] = new SnakeSegment("body", (document.documentElement.clientWidth) / 2, (document.documentElement.scrollHeight) / 2 - 46);
-    Snake[2] = new SnakeSegment("tail", (document.documentElement.clientWidth) / 2, (document.documentElement.scrollHeight) / 2 -92);
+    Snake[0] = new SnakeSegment("head", (document.documentElement.clientWidth) / 2, (document.documentElement.scrollHeight) / 2, 0);
+    Snake[1] = new SnakeSegment("body", (document.documentElement.clientWidth) / 2, (document.documentElement.scrollHeight) / 2 - 45, 0);
+    Snake[2] = new SnakeSegment("body", (document.documentElement.clientWidth) / 2, (document.documentElement.scrollHeight) / 2 - 90, 0);
+    Snake[3] = new SnakeSegment("body", (document.documentElement.clientWidth) / 2, (document.documentElement.scrollHeight) / 2 - 90-45, 0);
+    Snake[4] = new SnakeSegment("tail", (document.documentElement.clientWidth) / 2, (document.documentElement.scrollHeight) / 2 - 90-45, 0);
 
     GameLoop()
 }
 
 function GameLoop() {
+
     var Dead = 0
-    const loop = setInterval(function(){
-        if(Dead) { return clearInterval(loop) }
+    const snakeloop = setInterval(function(){
+        if(Dead) { return clearInterval(snakeloop) }
         else{
             Movement();
+            
         }
-    },200)
-    //}
+    }, 200) // New Snake movement every 0.2 seconds (5 fps)
 
+    window.onkeypress = function (press) {
+        if (press.keyCode == 97) {
+            //Left
+            if (Snake[0].getRotation() !== -90) {
+                Snake[0].setRotation(90);
+            }
+        };
+        if (press.keyCode == 119) {
+            //Up
+            if (Snake[0].getRotation() !== 0) {
+                Snake[0].setRotation(180);
+            }
+        };
+        if (press.keyCode == 100) {
+            //Right
+            if (Snake[0].getRotation() !== 90) {
+                Snake[0].setRotation(-90);
+            }
+        };
+        if (press.keyCode == 115) {
+            //Down
+            if (Snake[0].getRotation() !== 180) {
+                Snake[0].setRotation(0);
+            }
+        };
+    };
+
+    const appleloop = setInterval(function () {
+        if (Dead) { return clearInterval(appleloop) }
+        else {
+            SpawnApple();
+
+        };
+    }, 5000) // Apple spawns every 5 seconds
 
 }
+
 
 function AddSegment() {
     Snake[Snake.length - 1].setType("body");
     var PreviousCoordinates = Snake[Snake.length - 1].getPosition();
-    Snake[Snake.length] = new SnakeSegment("tail", PreviousCoordinates.x, PreviousCoordinates.y - 46)
+    Snake[Snake.length] = new SnakeSegment("tail", PreviousCoordinates.x, PreviousCoordinates.y - 46);
 
 }
 
@@ -35,11 +73,21 @@ function AddSegment() {
 
 function Movement() {
 
-    if ((Math.floor(Math.random() * 20)) == 1) {
-        SpawnApple();
-    }
+    var HeadRotation = Snake[0].getRotation();
     var HeadPosition = Snake[0].getPosition();
-    Snake[0].setPosition(HeadPosition.x, HeadPosition.y + 46); // Increments the position of the head of the snake
+    if (HeadRotation == 90) {
+        Snake[0].setPosition(HeadPosition.x-45, HeadPosition.y); // Increments the position of the head of the snake left
+    };
+    if (HeadRotation == 180) {
+        Snake[0].setPosition(HeadPosition.x, HeadPosition.y - 45); // Increments the position of the head of the snake down
+    };
+    if (HeadRotation == -90) {
+        Snake[0].setPosition(HeadPosition.x+45, HeadPosition.y); // Increments the position of the head of the snake right
+    };
+    if (HeadRotation == 0) {
+        Snake[0].setPosition(HeadPosition.x, HeadPosition.y + 45); // Increments the position of the head of the snake up
+    };
+
     Snake[Snake.length - 1].setPosition(HeadPosition.x, HeadPosition.y); // Moves the tail piece to where the head was
     Snake[Snake.length - 1].setType("body"); // Alters the tail piece to become a body segment
     Snake.splice(1, 0, Snake[Snake.length - 1]); // Adds the altered tail piece in the list between the head and first body connection
