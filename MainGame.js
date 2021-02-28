@@ -34,6 +34,10 @@ function AddSegment() {
 
 
 function Movement() {
+
+    if ((Math.floor(Math.random() * 20)) == 1) {
+        SpawnApple();
+    }
     var HeadPosition = Snake[0].getPosition();
     Snake[0].setPosition(HeadPosition.x, HeadPosition.y + 46); // Increments the position of the head of the snake
     Snake[Snake.length - 1].setPosition(HeadPosition.x, HeadPosition.y); // Moves the tail piece to where the head was
@@ -42,7 +46,7 @@ function Movement() {
     Snake.splice(Snake.length - 1, 1); // Deletes the initial tail piece from the list
     Snake[Snake.length - 1].setType("tail"); // Alters the now final item in the list (body) to be a tail
     
-
+    
 }
 
 function SpawnApple() {
