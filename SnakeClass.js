@@ -27,7 +27,7 @@ class SnakeSegment {
     setType(SegmentType) {
         this.type = SegmentType;
         this.Image.src = "C:/Users/wwwku/source/repos/Snake/" + this.type + ".png";
-
+        
     }
 
     getPosition() {
