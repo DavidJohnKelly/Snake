@@ -1,29 +1,27 @@
 var Snake = [];
-
+var AppleList = [];
 function GameStart() {
     var StartButton = document.getElementById("StartButton");
     StartButton.style.visibility = "hidden";
 
-    Snake[0]=new SnakeSegment("head", 300, 100);
-    Snake[1] = new SnakeSegment("body", 300, 100 - 46);
-    Snake[2] = new SnakeSegment("body", 300, 100 - 92);
-    Snake[3] = new SnakeSegment("body", 300, 100 - 92-46);
-    Snake[4] = new SnakeSegment("tail", 300, 100 - 92 - 46-46);
-    Snake[5] = new SnakeSegment("tail", 300, 100 - 92 - 46 - 46 - 46);
+    Snake[0] = new SnakeSegment("head", (document.documentElement.clientWidth) / 2, (document.documentElement.scrollHeight) / 2);
+    Snake[1] = new SnakeSegment("body", (document.documentElement.clientWidth) / 2, (document.documentElement.scrollHeight) / 2 - 46);
+    Snake[2] = new SnakeSegment("tail", (document.documentElement.clientWidth) / 2, (document.documentElement.scrollHeight) / 2 -92);
+
     GameLoop()
 }
 
 function GameLoop() {
-    
-    //Movement();
-    Movement(); Movement(); Movement(); Movement(); Movement();
-    AddSegment()
-    Movement(); Movement(); Movement();
-    AddSegment()
-    Movement(); Movement(); Movement();
-    AddSegment(); AddSegment();
-        //sleep(100);
-    
+    var Dead = 0
+    const loop = setInterval(function(){
+        if(Dead) { return clearInterval(loop) }
+        else{
+            Movement();
+        }
+    },200)
+    //}
+
+
 }
 
 function AddSegment() {
@@ -33,11 +31,7 @@ function AddSegment() {
 
 }
 
-function sleep(miliseconds) {
-    var currentTime = new Date().getTime();
-    while (currentTime + miliseconds >= new Date().getTime()) {
-    }
-}
+
 
 function Movement() {
     var HeadPosition = Snake[0].getPosition();
@@ -46,10 +40,17 @@ function Movement() {
     Snake[Snake.length - 1].setType("body"); // Alters the tail piece to become a body segment
     Snake.splice(1, 0, Snake[Snake.length - 1]); // Adds the altered tail piece in the list between the head and first body connection
     Snake.splice(Snake.length - 1, 1); // Deletes the initial tail piece from the list
-
     Snake[Snake.length - 1].setType("tail"); // Alters the now final item in the list (body) to be a tail
+    
 
+}
 
+function SpawnApple() {
+    if (AppleList.length = 0) {
+        AppleList[0] = new Apple;
+    } else {
+        AppleList[AppleList.length - 1] = new Apple;
+    }
 }
 
 
