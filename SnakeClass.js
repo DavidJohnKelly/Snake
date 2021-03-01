@@ -8,6 +8,7 @@ class SnakeSegment {
         };
         
         this.rotation = rotation;
+        
         this.Image = document.createElement("img");
         this.Image.src = "C:/Users/wwwku/source/repos/Snake/" + type + ".png";
         this.Image.style.position = "absolute";
