@@ -12,10 +12,10 @@ function GameStart() {
     var StartButton = document.getElementById("StartButton");
     StartButton.style.visibility = "hidden";
     //Using grid system of 45 x 45 px
-    Snake[0] = new SnakeSegment("head", Math.round(((document.documentElement.clientWidth) / 2) / 45) * 45, Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45, 0);
-    Snake[1] = new SnakeSegment("body", Math.round(((document.documentElement.clientWidth) / 2) / 45) * 45, Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45 - 45, 0);
+    Snake[0] = new SnakeSegment(Math.round(((document.documentElement.clientWidth) / 2) / 45) * 45, Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45, 0);
+    Snake[1] = new SnakeSegment(Math.round(((document.documentElement.clientWidth) / 2) / 45) * 45, Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45 - 45, 0);
     Snake_Location_Dictionary[(Math.round(((document.documentElement.clientWidth) / 2) / 45) * 45).toString() + ":" + (Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45 - 45).toString()] = 1;
-    Snake[2] = new SnakeSegment("tail", Math.round(((document.documentElement.clientWidth) / 2) / 45) * 45, Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45 - 90, 0);
+    Snake[2] = new SnakeSegment(Math.round(((document.documentElement.clientWidth) / 2) / 45) * 45, Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45 - 90, 0);
     Snake_Location_Dictionary[(Math.round(((document.documentElement.clientWidth) / 2) / 45) * 45).toString() + ":" + (Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45 - 90).toString()] = 1;
     GameLoop()
 }
@@ -38,9 +38,11 @@ function GameLoop() {
             //Left
             if (Snake[0].getRotation() !== -90) {
                 Snake[0].setRotation(90);
+
             }
 
         };
+
         if (press.keyCode == 119) {
             //Up
             if (Snake[0].getRotation() !== 0) {
@@ -48,12 +50,15 @@ function GameLoop() {
 
             }
         };
+
         if (press.keyCode == 100) {
             //Right
             if (Snake[0].getRotation() !== 90) {
                 Snake[0].setRotation(-90);
+
             }
         };
+
         if (press.keyCode == 115) {
             //Down
             if (Snake[0].getRotation() !== 180) {
@@ -75,10 +80,27 @@ function GameLoop() {
 }
 
 function AddSegment() { //Adds a new body segment to the snake
-    Snake[Snake.length - 1].setType("body");
+    ///console.log("WDAWDWDAW");
+    var SnakeTailDirection = Snake[Snake.length - 1].getRotation();
+    console.log(SnakeTailDirection);
+    //alert(SnakeTailDirection);
     var PreviousCoordinates = Snake[Snake.length - 1].getPosition();
-    Snake[Snake.length] = new SnakeSegment("tail", PreviousCoordinates.x, PreviousCoordinates.y - 46);
-    Snake_Location_Dictionary[PreviousCoordinates.x + ":" + (PreviousCoordinates.y - 46).toString] = 1;
+    if (SnakeTailDirection = 0) {
+        Snake[Snake.length] = new SnakeSegment(PreviousCoordinates.x, PreviousCoordinates.y - 45);
+        Snake_Location_Dictionary[PreviousCoordinates.x + ":" + (PreviousCoordinates.y - 45).toString()] = 1;
+    }
+    else if (SnakeTailDirection = 90) {
+        Snake[Snake.length] = new SnakeSegment(PreviousCoordinates.x-45, PreviousCoordinates.y);
+        Snake_Location_Dictionary[(PreviousCoordinates.x - 45).toString() + ":" + (PreviousCoordinates.y).toString()] = 1;
+    }
+    else if (SnakeTailDirection = -90){
+        Snake[Snake.length] = new SnakeSegment(PreviousCoordinates.x + 45, PreviousCoordinates.y);
+        Snake_Location_Dictionary[(PreviousCoordinates.x + 45).toString() + ":" + (PreviousCoordinates.y).toString()] = 1;
+    }
+    else if (SnakeTailDirection = 180) {
+        Snake[Snake.length] = new SnakeSegment(PreviousCoordinates.x, PreviousCoordinates.y + 45);
+        Snake_Location_Dictionary[(PreviousCoordinates.x) + ":" + (PreviousCoordinates.y + 45).toString()] = 1;
+    }
 }
 
 function Movement() {
@@ -87,14 +109,13 @@ function Movement() {
     var HeadRotation = Snake[0].getRotation();
     var HeadPosition = Snake[0].getPosition();
     var TailPosition = Snake[Snake.length - 1].getPosition();
-    Snake[Snake.length - 1].setPosition(HeadPosition.x, HeadPosition.y); // Moves the tail piece to where the head was
-    Snake[Snake.length - 1].setType("body"); // Alters the tail piece to become a body segment
     Snake.splice(1, 0, Snake[Snake.length - 1]); // Adds the altered tail piece in the list between the head and first body connection
+    Snake[1].setRotation(HeadRotation);
+    Snake[1].setPosition(HeadPosition.x, HeadPosition.y); // Moves the tail piece to where the head was
     Snake.splice(Snake.length - 1, 1); // Deletes the initial tail piece from the list
-    Snake[Snake.length - 1].setType("tail"); // Alters the now final item in the list (body) to be a tail
     delete Snake_Location_Dictionary[TailPosition.x + ":" + TailPosition.y]; // Removes the location of the tail from the location dictionary
     Snake_Location_Dictionary[HeadPosition.x + ":" + HeadPosition.y] = 1; // Updates the dictionary with the new location of the tail piece
-    
+
     if (HeadRotation == 90) {
         Snake[0].setPosition(HeadPosition.x - 45, HeadPosition.y); // Increments the position of the head of the snake left
     };
@@ -109,7 +130,6 @@ function Movement() {
         Snake[0].setPosition(HeadPosition.x, HeadPosition.y + 45); // Increments the position of the head of the snake up
 
     };
-
     HeadPosition = Snake[0].getPosition() // Gets the new head position and checks it against the location of the body segments.
     if (typeof Snake_Location_Dictionary[HeadPosition.x.toString() + ":" + HeadPosition.y.toString()] !== "undefined") {
         Dead = 1;
