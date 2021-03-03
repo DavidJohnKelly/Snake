@@ -80,7 +80,7 @@ function GameLoop() {
             SpawnApple();
 
         };
-    }, 500) // Apple spawns every 5 seconds
+    }, 5000) // Apple spawns every 5 seconds
 
 }
 
