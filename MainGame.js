@@ -9,14 +9,20 @@ var Score = 0;
 var Dead = 0
 
 function GameStart() {
+
+    document.documentElement.style.overflow = "hidden";
+    document.body.scroll = "no";
     var StartButton = document.getElementById("StartButton");
     StartButton.style.visibility = "hidden";
     //Using grid system of 45 x 45 px
-    Snake[0] = new SnakeSegment(Math.round(((document.documentElement.clientWidth) / 2) / 45) * 45, Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45, "down"); // Head can't collide with itself so no need to add to dictionary
-    Snake[1] = new SnakeSegment(Math.round(((document.documentElement.clientWidth) / 2) / 45) * 45, Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45 - 45, "down");
-    Snake_Location_Dictionary[(Math.round(((document.documentElement.clientWidth) / 2) / 45) * 45).toString() + ":" + (Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45 - 45).toString()] = 1;
-    Snake[2] = new SnakeSegment(Math.round(((document.documentElement.clientWidth) / 2) / 45) * 45, Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45 - 90, "down");
-    Snake_Location_Dictionary[(Math.round(((document.documentElement.clientWidth) / 2) / 45) * 45).toString() + ":" + (Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45 - 90).toString()] = 1;
+
+    var width = Math.round(((document.documentElement.clientWidth) / 2) / 45) * 45
+    var height = Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45
+    Snake[0] = new SnakeSegment(width, height, "down"); // Head can't collide with itself so no need to add to dictionary
+    Snake[1] = new SnakeSegment(width, Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45 - 45, "down");
+    Snake_Location_Dictionary[width.toString() + ":" + (height - 45).toString()] = 1;
+    Snake[2] = new SnakeSegment(width, height - 90, "down");
+    Snake_Location_Dictionary[width.toString() + ":" + (height - 90).toString()] = 1;
     GameLoop()
 }
 
@@ -74,7 +80,7 @@ function GameLoop() {
             SpawnApple();
 
         };
-    }, 5000) // Apple spawns every 5 seconds
+    }, 500) // Apple spawns every 5 seconds
 
 }
 
@@ -104,6 +110,8 @@ function AddSegment() { //Adds a new body segment to the snake
 
 function Movement() {
 
+    var width = Math.round(document.body.clientWidth / 45) * 45;
+    var height = Math.round(document.documentElement.clientHeight / 45) * 45;
 
     var HeadDirection = Snake[0].getDirection();
     var HeadPosition = Snake[0].getPosition();
@@ -117,22 +125,38 @@ function Movement() {
 
     if (HeadDirection == "up") {
         Snake[0].setPosition(HeadPosition.x, HeadPosition.y - 45); // Increments the position of the head of the snake up
+        HeadPosition = Snake[0].getPosition();
+
+        if (HeadPosition.y < 0) {
+            Snake[0].setPosition(HeadPosition.x, height);
+        }
     };
     if (HeadDirection == "left") {
         Snake[0].setPosition(HeadPosition.x - 45, HeadPosition.y); // Increments the position of the head of the snake left
+        HeadPosition = Snake[0].getPosition();
+        if (HeadPosition.x < 0) {
+            Snake[0].setPosition(width, HeadPosition.y);
+        }
     };
 
     if (HeadDirection == "right") {
         Snake[0].setPosition(HeadPosition.x + 45, HeadPosition.y); // Increments the position of the head of the snake right
-
+        HeadPosition = Snake[0].getPosition();
+        if (HeadPosition.x >width) {
+            Snake[0].setPosition(0, HeadPosition.y);
+        }
     };
     if (HeadDirection == "down") {
         Snake[0].setPosition(HeadPosition.x, HeadPosition.y + 45); // Increments the position of the head of the snake down
-
+        HeadPosition = Snake[0].getPosition()
+        if (HeadPosition.y > height) {
+            Snake[0].setPosition(HeadPosition.x, 0);
+        }
     };
-    HeadPosition = Snake[0].getPosition() // Gets the new head position and checks it against the location of the body segments.
+
+    // Checks the new head position against the locations of the body segments.
     if (typeof Snake_Location_Dictionary[HeadPosition.x.toString() + ":" + HeadPosition.y.toString()] !== "undefined") {
-        Dead = 1;
+        Dead = 1; //Collision between segments so game is over
     }
 
     //Checks for collisions between snake and apples
@@ -147,10 +171,10 @@ function Movement() {
 
 //Spawns an Apple at a random coordinate and adds it to the dictionary object.
 function SpawnApple() {
-    var width = document.body.clientWidth - 40;
-    var height = document.documentElement.clientHeight - 40;
-    var xcoord = (Math.round((Math.floor(Math.random() * width) + 10) / 45) * 45);
-    var ycoord = (Math.round((Math.floor(Math.random() * height) - 10) / 45) * 45);
+    var width = document.body.clientWidth -50;
+    var height = document.documentElement.clientHeight -50;
+    var xcoord = (Math.round((Math.floor(Math.random() * width)) / 45) * 45);
+    var ycoord = (Math.round((Math.floor(Math.random() * height)) / 45) * 45);
     var ApplePosition = {
         x: xcoord.toString(),
         y: ycoord.toString(),

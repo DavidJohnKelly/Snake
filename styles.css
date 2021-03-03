@@ -6,7 +6,7 @@
 #leftborder, #rightborder {
     top: 0;
     bottom: 0;
-    width: 10px;
+    width: 5px;
 }
 
 #leftborder {
@@ -20,7 +20,7 @@
 #topborder, #bottomborder {
     left: 0;
     right: 0;
-    height: 10px;
+    height: 5px;
 }
 
 #topborder {
