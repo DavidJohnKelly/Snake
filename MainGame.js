@@ -1,3 +1,4 @@
+//Using multiple local copies of the width and height variables to allow for window resizing
 var Snake = [];
 var Apple_Location_Dictionary = { // O(1) coordinate lookup!
 
@@ -10,12 +11,11 @@ var Dead = 0
 
 function GameStart() {
 
-    document.documentElement.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden"; //Disables the scroll bars
     document.body.scroll = "no";
     var StartButton = document.getElementById("StartButton");
     StartButton.style.visibility = "hidden";
     //Using grid system of 45 x 45 px
-
     var width = Math.round(((document.documentElement.clientWidth) / 2) / 45) * 45
     var height = Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45
     Snake[0] = new SnakeSegment(width, height, "down"); // Head can't collide with itself so no need to add to dictionary
@@ -87,21 +87,18 @@ function GameLoop() {
 function AddSegment() { //Adds a new body segment to the snake
     var SnakeTailDirection = Snake[Snake.length - 1].getDirection();
     var PreviousCoordinates = Snake[Snake.length - 1].getPosition();
-    if (SnakeTailDirection == "up") {
+    if (SnakeTailDirection == "up") { //Adds the new segment below the tail piece
         Snake[Snake.length] = new SnakeSegment(PreviousCoordinates.x, PreviousCoordinates.y + 45, SnakeTailDirection);
         Snake_Location_Dictionary[PreviousCoordinates.x + ":" + (PreviousCoordinates.y + 45).toString()] = 1;
-    }
-    else if (SnakeTailDirection == "left") {
+    } else if (SnakeTailDirection == "left") { //Adds the new segment to the right of the tail piece
         Snake[Snake.length] = new SnakeSegment(PreviousCoordinates.x + 45, PreviousCoordinates.y, SnakeTailDirection);
         Snake_Location_Dictionary[(PreviousCoordinates.x + 45).toString() + ":" + (PreviousCoordinates.y).toString()] = 1;
 
-    }
-    else if (SnakeTailDirection == "right"){
+    } else if (SnakeTailDirection == "right") { //Adds the new segment to the left of the tail piece
         Snake[Snake.length] = new SnakeSegment(PreviousCoordinates.x - 45, PreviousCoordinates.y, SnakeTailDirection);
         Snake_Location_Dictionary[(PreviousCoordinates.x - 45).toString() + ":" + (PreviousCoordinates.y).toString()] = 1;
 
-    }
-    else if (SnakeTailDirection == "down") {
+    } else if (SnakeTailDirection == "down") { //Adds the new segment above the tail piece
         Snake[Snake.length] = new SnakeSegment(PreviousCoordinates.x, PreviousCoordinates.y - 45, SnakeTailDirection);
         Snake_Location_Dictionary[(PreviousCoordinates.x) + ":" + (PreviousCoordinates.y - 45).toString()] = 1;
 
@@ -127,14 +124,14 @@ function Movement() {
         Snake[0].setPosition(HeadPosition.x, HeadPosition.y - 45); // Increments the position of the head of the snake up
         HeadPosition = Snake[0].getPosition();
 
-        if (HeadPosition.y < 0) {
+        if (HeadPosition.y < 0) { //Checks if segment is off screen, loops on other side if it is
             Snake[0].setPosition(HeadPosition.x, height);
         }
     };
     if (HeadDirection == "left") {
         Snake[0].setPosition(HeadPosition.x - 45, HeadPosition.y); // Increments the position of the head of the snake left
         HeadPosition = Snake[0].getPosition();
-        if (HeadPosition.x < 0) {
+        if (HeadPosition.x < 0) { //Checks if segment is off screen, loops on other side if it is
             Snake[0].setPosition(width, HeadPosition.y);
         }
     };
@@ -142,14 +139,14 @@ function Movement() {
     if (HeadDirection == "right") {
         Snake[0].setPosition(HeadPosition.x + 45, HeadPosition.y); // Increments the position of the head of the snake right
         HeadPosition = Snake[0].getPosition();
-        if (HeadPosition.x >width) {
+        if (HeadPosition.x > width) { //Checks if segment is off screen, loops on other side if it is
             Snake[0].setPosition(0, HeadPosition.y);
         }
     };
     if (HeadDirection == "down") {
         Snake[0].setPosition(HeadPosition.x, HeadPosition.y + 45); // Increments the position of the head of the snake down
         HeadPosition = Snake[0].getPosition()
-        if (HeadPosition.y > height) {
+        if (HeadPosition.y > height) { //Checks if segment is off screen, loops on other side if it is
             Snake[0].setPosition(HeadPosition.x, 0);
         }
     };
@@ -171,8 +168,8 @@ function Movement() {
 
 //Spawns an Apple at a random coordinate and adds it to the dictionary object.
 function SpawnApple() {
-    var width = document.body.clientWidth -50;
-    var height = document.documentElement.clientHeight -50;
+    var width = document.body.clientWidth - 50; //-50 to stop it spawning out of bounds
+    var height = document.documentElement.clientHeight - 50; //-50 to stop it spawning out of bounds
     var xcoord = (Math.round((Math.floor(Math.random() * width)) / 45) * 45);
     var ycoord = (Math.round((Math.floor(Math.random() * height)) / 45) * 45);
     var ApplePosition = {
