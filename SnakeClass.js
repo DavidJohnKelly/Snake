@@ -1,14 +1,14 @@
 class SnakeSegment {
 
-    constructor(type, x, y) {
-        this.type = type;
+    constructor(x, y,direction) {
         this.coordinates = {
             x: x,
             y: y,
         };
-
+        
+        this.direction = direction;    
         this.Image = document.createElement("img");
-        this.Image.src = "C:/Users/wwwku/source/repos/Snake/" + type + ".png";
+        this.Image.src = "C:/Users/wwwku/source/repos/Snake/Snake.png";
         this.Image.style.position = "absolute";
         this.Image.style.left = this.coordinates.x.toString() + "px";
         this.Image.style.top = this.coordinates.y.toString() + "px";
@@ -21,17 +21,19 @@ class SnakeSegment {
             y: ycoord,
         };
         this.Image.style.left = this.coordinates.x.toString() + "px";
-        this.Image.style.top = this.coordinates.y.toString() + "px";
+        this.Image.style.top = this.coordinates.y.toString() + "px";        
     };
-
-    setType(SegmentType) {
-        this.type = SegmentType;
-        this.Image.src = "C:/Users/wwwku/source/repos/Snake/" + this.type + ".png";
-        
-    }
 
     getPosition() {
         return this.coordinates;
+    }
+
+    setDirection(Direction) {
+        this.direction = Direction;
+    }
+
+    getDirection() {
+        return this.direction;
     }
 
 }

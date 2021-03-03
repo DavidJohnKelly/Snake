@@ -1,60 +1,183 @@
 var Snake = [];
-var AppleList = [];
+var Apple_Location_Dictionary = { // O(1) coordinate lookup!
+
+};
+var Snake_Location_Dictionary = { // O(1) coordinate lookup!
+
+};
+var Score = 0;
+var Dead = 0
+
 function GameStart() {
+
+    document.documentElement.style.overflow = "hidden";
+    document.body.scroll = "no";
     var StartButton = document.getElementById("StartButton");
     StartButton.style.visibility = "hidden";
+    //Using grid system of 45 x 45 px
 
-    Snake[0] = new SnakeSegment("head", (document.documentElement.clientWidth) / 2, (document.documentElement.scrollHeight) / 2);
-    Snake[1] = new SnakeSegment("body", (document.documentElement.clientWidth) / 2, (document.documentElement.scrollHeight) / 2 - 46);
-    Snake[2] = new SnakeSegment("tail", (document.documentElement.clientWidth) / 2, (document.documentElement.scrollHeight) / 2 -92);
-
+    var width = Math.round(((document.documentElement.clientWidth) / 2) / 45) * 45
+    var height = Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45
+    Snake[0] = new SnakeSegment(width, height, "down"); // Head can't collide with itself so no need to add to dictionary
+    Snake[1] = new SnakeSegment(width, Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45 - 45, "down");
+    Snake_Location_Dictionary[width.toString() + ":" + (height - 45).toString()] = 1;
+    Snake[2] = new SnakeSegment(width, height - 90, "down");
+    Snake_Location_Dictionary[width.toString() + ":" + (height - 90).toString()] = 1;
     GameLoop()
 }
 
 function GameLoop() {
-    var Dead = 0
-    const loop = setInterval(function(){
-        if(Dead) { return clearInterval(loop) }
-        else{
+
+    const snakeloop = setInterval(function () {
+        if (Dead) {
+            alert("You died! Score: " + Score.toString());
+            clearInterval(snakeloop);
+            window.location.reload();
+        } else {
             Movement();
+
         }
-    },200)
-    //}
+    }, 200) // New Snake movement every 0.2 seconds (5 fps)
 
+    window.onkeypress = function (press) {
+        if (press.keyCode == 97) {
+            //Left
+            if (Snake[0].getDirection() !== "right") {
+                Snake[0].setDirection("left");
+            }
+
+        };
+
+        if (press.keyCode == 119) {
+            //Up
+            if (Snake[0].getDirection() !== "down") {
+                Snake[0].setDirection("up");
+
+            }
+        };
+
+        if (press.keyCode == 100) {
+            //Right
+            if (Snake[0].getDirection() !== "left") {
+                Snake[0].setDirection("right");
+
+            }
+        };
+
+        if (press.keyCode == 115) {
+            //Down
+            if (Snake[0].getDirection() !== "up") {
+                Snake[0].setDirection("down");
+
+            }
+        };
+    };
+
+    const appleloop = setInterval(function () {
+        if (Dead) {
+            return clearInterval(appleloop)
+        } else {
+            SpawnApple();
+
+        };
+    }, 500) // Apple spawns every 5 seconds
 
 }
 
-function AddSegment() {
-    Snake[Snake.length - 1].setType("body");
+function AddSegment() { //Adds a new body segment to the snake
+    var SnakeTailDirection = Snake[Snake.length - 1].getDirection();
     var PreviousCoordinates = Snake[Snake.length - 1].getPosition();
-    Snake[Snake.length] = new SnakeSegment("tail", PreviousCoordinates.x, PreviousCoordinates.y - 46)
+    if (SnakeTailDirection == "up") {
+        Snake[Snake.length] = new SnakeSegment(PreviousCoordinates.x, PreviousCoordinates.y + 45, SnakeTailDirection);
+        Snake_Location_Dictionary[PreviousCoordinates.x + ":" + (PreviousCoordinates.y + 45).toString()] = 1;
+    }
+    else if (SnakeTailDirection == "left") {
+        Snake[Snake.length] = new SnakeSegment(PreviousCoordinates.x + 45, PreviousCoordinates.y, SnakeTailDirection);
+        Snake_Location_Dictionary[(PreviousCoordinates.x + 45).toString() + ":" + (PreviousCoordinates.y).toString()] = 1;
 
+    }
+    else if (SnakeTailDirection == "right"){
+        Snake[Snake.length] = new SnakeSegment(PreviousCoordinates.x - 45, PreviousCoordinates.y, SnakeTailDirection);
+        Snake_Location_Dictionary[(PreviousCoordinates.x - 45).toString() + ":" + (PreviousCoordinates.y).toString()] = 1;
+
+    }
+    else if (SnakeTailDirection == "down") {
+        Snake[Snake.length] = new SnakeSegment(PreviousCoordinates.x, PreviousCoordinates.y - 45, SnakeTailDirection);
+        Snake_Location_Dictionary[(PreviousCoordinates.x) + ":" + (PreviousCoordinates.y - 45).toString()] = 1;
+
+    }
 }
-
-
 
 function Movement() {
 
-    if ((Math.floor(Math.random() * 20)) == 1) {
-        SpawnApple();
-    }
+    var width = Math.round(document.body.clientWidth / 45) * 45;
+    var height = Math.round(document.documentElement.clientHeight / 45) * 45;
+
+    var HeadDirection = Snake[0].getDirection();
     var HeadPosition = Snake[0].getPosition();
-    Snake[0].setPosition(HeadPosition.x, HeadPosition.y + 46); // Increments the position of the head of the snake
-    Snake[Snake.length - 1].setPosition(HeadPosition.x, HeadPosition.y); // Moves the tail piece to where the head was
-    Snake[Snake.length - 1].setType("body"); // Alters the tail piece to become a body segment
+    var TailPosition = Snake[Snake.length - 1].getPosition();
     Snake.splice(1, 0, Snake[Snake.length - 1]); // Adds the altered tail piece in the list between the head and first body connection
+    Snake[1].setDirection(HeadDirection);
+    Snake[1].setPosition(HeadPosition.x, HeadPosition.y); // Moves the tail piece to where the head was
     Snake.splice(Snake.length - 1, 1); // Deletes the initial tail piece from the list
-    Snake[Snake.length - 1].setType("tail"); // Alters the now final item in the list (body) to be a tail
-    
-    
-}
+    delete Snake_Location_Dictionary[TailPosition.x + ":" + TailPosition.y]; // Removes the location of the tail from the location dictionary
+    Snake_Location_Dictionary[HeadPosition.x + ":" + HeadPosition.y] = 1; // Updates the dictionary with the new location of the tail piece
 
-function SpawnApple() {
-    if (AppleList.length = 0) {
-        AppleList[0] = new Apple;
-    } else {
-        AppleList[AppleList.length - 1] = new Apple;
+    if (HeadDirection == "up") {
+        Snake[0].setPosition(HeadPosition.x, HeadPosition.y - 45); // Increments the position of the head of the snake up
+        HeadPosition = Snake[0].getPosition();
+
+        if (HeadPosition.y < 0) {
+            Snake[0].setPosition(HeadPosition.x, height);
+        }
+    };
+    if (HeadDirection == "left") {
+        Snake[0].setPosition(HeadPosition.x - 45, HeadPosition.y); // Increments the position of the head of the snake left
+        HeadPosition = Snake[0].getPosition();
+        if (HeadPosition.x < 0) {
+            Snake[0].setPosition(width, HeadPosition.y);
+        }
+    };
+
+    if (HeadDirection == "right") {
+        Snake[0].setPosition(HeadPosition.x + 45, HeadPosition.y); // Increments the position of the head of the snake right
+        HeadPosition = Snake[0].getPosition();
+        if (HeadPosition.x >width) {
+            Snake[0].setPosition(0, HeadPosition.y);
+        }
+    };
+    if (HeadDirection == "down") {
+        Snake[0].setPosition(HeadPosition.x, HeadPosition.y + 45); // Increments the position of the head of the snake down
+        HeadPosition = Snake[0].getPosition()
+        if (HeadPosition.y > height) {
+            Snake[0].setPosition(HeadPosition.x, 0);
+        }
+    };
+
+    // Checks the new head position against the locations of the body segments.
+    if (typeof Snake_Location_Dictionary[HeadPosition.x.toString() + ":" + HeadPosition.y.toString()] !== "undefined") {
+        Dead = 1; //Collision between segments so game is over
     }
+
+    //Checks for collisions between snake and apples
+    if (typeof Apple_Location_Dictionary[HeadPosition.x.toString() + ":" + HeadPosition.y.toString()] !== "undefined") {
+        Apple_Location_Dictionary[HeadPosition.x.toString() + ":" + HeadPosition.y.toString()].eaten();
+        delete Apple_Location_Dictionary[HeadPosition.x.toString() + ":" + HeadPosition.y.toString()];
+        document.getElementById("Score").innerHTML = "Score: " + Score.toString();
+        AddSegment();
+    }
+
 }
 
-
+//Spawns an Apple at a random coordinate and adds it to the dictionary object.
+function SpawnApple() {
+    var width = document.body.clientWidth -50;
+    var height = document.documentElement.clientHeight -50;
+    var xcoord = (Math.round((Math.floor(Math.random() * width)) / 45) * 45);
+    var ycoord = (Math.round((Math.floor(Math.random() * height)) / 45) * 45);
+    var ApplePosition = {
+        x: xcoord.toString(),
+        y: ycoord.toString(),
+    };
+    Apple_Location_Dictionary[ApplePosition.x + ":" + ApplePosition.y] = new Apple(ApplePosition.x, ApplePosition.y);
+}
