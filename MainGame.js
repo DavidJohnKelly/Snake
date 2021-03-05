@@ -37,41 +37,32 @@ function GameLoop() {
             Movement();
 
         }
-    }, 200) // New Snake movement every 0.2 seconds (5 fps)
+    }, 200) // New Snake movement every 0.2 seconds initially (5 fps)
 
-    window.onkeypress = function (press) {
-        if (press.keyCode == 97) {
+    document.addEventListener("keydown", function (press) {
+        var SnakeDirection = Snake[0].getDirection();
+        var KeyPressed = press.code;
+
+        if (KeyPressed == "KeyA" && SnakeDirection !=="right") {
             //Left
-            if (Snake[0].getDirection() !== "right") {
-                Snake[0].setDirection("left");
-            }
-
+            Snake[0].setDirection("left");
         };
 
-        if (press.keyCode == 119) {
+        if (KeyPressed == "KeyW" && SnakeDirection !== "down") {
             //Up
-            if (Snake[0].getDirection() !== "down") {
-                Snake[0].setDirection("up");
-
-            }
+            Snake[0].setDirection("up");
         };
 
-        if (press.keyCode == 100) {
+        if (KeyPressed == "KeyD" && SnakeDirection !== "left") {
             //Right
-            if (Snake[0].getDirection() !== "left") {
-                Snake[0].setDirection("right");
-
-            }
+            Snake[0].setDirection("right");
         };
 
-        if (press.keyCode == 115) {
+        if (KeyPressed == "KeyS" && SnakeDirection !== "up") {
             //Down
-            if (Snake[0].getDirection() !== "up") {
-                Snake[0].setDirection("down");
-
-            }
+            Snake[0].setDirection("down");
         };
-    };
+    });
 
     const appleloop = setInterval(function () {
         if (Dead) {
@@ -170,11 +161,20 @@ function Movement() {
 function SpawnApple() {
     var width = document.body.clientWidth - 50; //-50 to stop it spawning out of bounds
     var height = document.documentElement.clientHeight - 50; //-50 to stop it spawning out of bounds
-    var xcoord = (Math.round((Math.floor(Math.random() * width)) / 45) * 45);
-    var ycoord = (Math.round((Math.floor(Math.random() * height)) / 45) * 45);
-    var ApplePosition = {
-        x: xcoord.toString(),
-        y: ycoord.toString(),
-    };
-    Apple_Location_Dictionary[ApplePosition.x + ":" + ApplePosition.y] = new Apple(ApplePosition.x, ApplePosition.y);
+    var Valid = 0
+
+    do {
+        var xcoord = (Math.round((Math.floor(Math.random() * width)) / 45) * 45);
+        var ycoord = (Math.round((Math.floor(Math.random() * height)) / 45) * 45);
+        if (typeof Apple_Location_Dictionary[xcoord.toString() + ":" + ycoord.toString()] === "undefined" && typeof Snake_Location_Dictionary[xcoord.toString() + ":" + ycoord.toString()] === "undefined") {
+            Valid = 1;
+            var ApplePosition = {
+                x: xcoord.toString(),
+                y: ycoord.toString(),
+            };
+            Apple_Location_Dictionary[ApplePosition.x + ":" + ApplePosition.y] = new Apple(ApplePosition.x, ApplePosition.y);
+        }
+    } while (Valid = 0);
+
+
 }
