@@ -10,23 +10,35 @@ var Score = 0;
 var Dead = 0
 
 function GameStart() {
+    //Using grid system of 45 x 45 px
+    var width = Math.round(((document.documentElement.clientWidth) / 5) / 45) * 45 //Player start coordinates
+    var height = Math.round(((document.documentElement.scrollHeight) / 5) / 45) * 45
 
     document.documentElement.style.overflow = "hidden"; //Disables the scroll bars
     document.body.scroll = "no";
     var StartButton = document.getElementById("StartButton");
     StartButton.style.visibility = "hidden";
-    //Using grid system of 45 x 45 px
-    var width = Math.round(((document.documentElement.clientWidth) / 2) / 45) * 45
-    var height = Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45
+
+    const appleloop = setInterval(function () {
+        if (Dead) {
+            return clearInterval(appleloop)
+        } else {
+            SpawnApple();
+
+        };
+    }, 5000) // Apple spawns every 5 seconds
+
+    //Initialises the player controlled snake
     Snake[0] = new SnakeSegment(width, height, "down"); // Head can't collide with itself so no need to add to dictionary
-    Snake[1] = new SnakeSegment(width, Math.round(((document.documentElement.scrollHeight) / 2) / 45) * 45 - 45, "down");
+    Snake[1] = new SnakeSegment(width, height - 45, "down");
     Snake_Location_Dictionary[width.toString() + ":" + (height - 45).toString()] = 1;
     Snake[2] = new SnakeSegment(width, height - 90, "down");
     Snake_Location_Dictionary[width.toString() + ":" + (height - 90).toString()] = 1;
-    GameLoop()
+    //Starts the player input
+    PlayerGameLoop()
 }
 
-function GameLoop() {
+function PlayerGameLoop() {
 
     const snakeloop = setInterval(function () {
         if (Dead) {
@@ -34,10 +46,10 @@ function GameLoop() {
             clearInterval(snakeloop);
             window.location.reload();
         } else {
-            Movement();
+            PlayerMovement();
 
         }
-    }, 200) // New Snake movement every 0.2 seconds initially (5 fps)
+    }, 200) // New Snake movement every 0.2 seconds (5 fps)
 
     document.addEventListener("keydown", function (press) {
         var SnakeDirection = Snake[0].getDirection();
@@ -64,14 +76,7 @@ function GameLoop() {
         };
     });
 
-    const appleloop = setInterval(function () {
-        if (Dead) {
-            return clearInterval(appleloop)
-        } else {
-            SpawnApple();
 
-        };
-    }, 5000) // Apple spawns every 5 seconds
 
 }
 
@@ -96,7 +101,7 @@ function AddSegment() { //Adds a new body segment to the snake
     }
 }
 
-function Movement() {
+function PlayerMovement() {
 
     var width = Math.round(document.body.clientWidth / 45) * 45;
     var height = Math.round(document.documentElement.clientHeight / 45) * 45;
@@ -175,6 +180,4 @@ function SpawnApple() {
             Apple_Location_Dictionary[ApplePosition.x + ":" + ApplePosition.y] = new Apple(ApplePosition.x, ApplePosition.y);
         }
     } while (Valid = 0);
-
-
 }
