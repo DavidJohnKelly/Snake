@@ -13,6 +13,7 @@ class SnakeSegment {
         this.Image.style.left = this.coordinates.x.toString() + "px";
         this.Image.style.top = this.coordinates.y.toString() + "px";
         document.body.appendChild(this.Image);
+
     };
 
     setPosition(xcoord, ycoord) {
@@ -34,6 +35,10 @@ class SnakeSegment {
 
     getDirection() {
         return this.direction;
+    }
+
+    remove() {
+        document.body.removeChild(this.Image);
     }
 
 }
