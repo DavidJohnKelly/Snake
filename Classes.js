@@ -30,7 +30,10 @@ class SnakeSegment {
     }
 
     setDirection(Direction) {
-        this.direction = Direction;
+        if (isValidDirection(Direction, this.direction)) {
+            console.log(Direction + "   " + this.direction);
+            this.direction = Direction;
+        }
     }
 
     getDirection() {

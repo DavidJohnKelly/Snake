@@ -8,7 +8,7 @@ var Snake_Location_Dictionary = { // O(1) coordinate lookup!
 };
 var Score = 0;
 var Dead = 0
-
+var AIDead = 0;
 function GameStart() {
 
     document.documentElement.style.overflow = "hidden"; //Disables the scroll bars
@@ -56,25 +56,23 @@ function PlayerGameLoop() {
     }, 200) // New Snake movement every 0.2 seconds (5 fps)
 
     document.addEventListener("keydown", function (press) {
-        var SnakeDirection = Snakes[0][0].getDirection();
         var KeyPressed = press.code;
-
-        if (KeyPressed == "KeyA" && SnakeDirection !=="right") {
+        if (KeyPressed == "KeyA") {
             //Left
             Snakes[0][0].setDirection("left");
         };
 
-        if (KeyPressed == "KeyW" && SnakeDirection !== "down") {
+        if (KeyPressed == "KeyW") {
             //Up
             Snakes[0][0].setDirection("up");
         };
 
-        if (KeyPressed == "KeyD" && SnakeDirection !== "left") {
+        if (KeyPressed == "KeyD") {
             //Right
             Snakes[0][0].setDirection("right");
         };
 
-        if (KeyPressed == "KeyS" && SnakeDirection !== "up") {
+        if (KeyPressed == "KeyS") {
             //Down
             Snakes[0][0].setDirection("down");
         };
@@ -84,7 +82,7 @@ function PlayerGameLoop() {
 
 function AIGameLoop() {
     //Using grid system of 45 x 45 px
-    var width = Math.round(((document.documentElement.clientWidth) / 1.25) / 45) * 45 //Player start coordinates
+    var width = Math.round(((document.documentElement.clientWidth) / 1.25) / 45) * 45 //Snake start coordinates
     var height = Math.round(((document.documentElement.scrollHeight) / 1.25) / 45) * 45
 
     //Initialises the player controlled snake
@@ -96,32 +94,67 @@ function AIGameLoop() {
     Snake_Location_Dictionary[width.toString() + ":" + (height - 90).toString()] = 1;
 
     const snakeloop = setInterval(function () {
-        if (Object.keys(Apple_Location_Dictionary).length > 0) {
-            var AISnakeHead = Snakes[1][0];
-            var AISnakeHeadPosition = AISnakeHead.getPosition();
-            var AppleObject = Object.values(Apple_Location_Dictionary)[0];
-
-            var ApplePosition = AppleObject.getPosition();
-            if (AISnakeHeadPosition.x < ApplePosition.x) {
-                AISnakeHead.setDirection("right");
+        if (AIDead) {
+            clearInterval(snakeloop);
+            AIGameLoop(); // Respawns the Ai
+        } else {
+            var AISnake = Snakes[1][0];
+            var AISnakePosition = AISnake.getPosition();
+            try {
+                var ApplePosition = Object.values(Apple_Location_Dictionary)[0].getPosition();
+            } catch {
+                ApplePosition = {
+                    x: (Math.round((Math.floor(Math.random() * width)) / 45) * 45).toString(),
+                    y: (Math.round((Math.floor(Math.random() * height)) / 45) * 45).toString(),
+                };
             }
-            else if (AISnakeHeadPosition.x > ApplePosition.x) {
-                AISnakeHead.setDirection("left");
+
+            if (AISnakePosition.x < ApplePosition.x) {
+                if (typeof Snake_Location_Dictionary[(AISnakePosition.x + 90) + ":" + AISnakePosition.y] === "undefined" && typeof Snake_Location_Dictionary[(AISnakePosition.x + 45) + ":" + AISnakePosition.y] === "undefined") {
+                    AISnake.setDirection("left");
+
+                } else {
+                    AISnake.setDirection("right");
+                }
+            }
+             else if (AISnakePosition.x > ApplePosition.x) {
+                if (typeof Snake_Location_Dictionary[(AISnakePosition.x - 90) + ":" + AISnakePosition.y] === "undefined" && typeof Snake_Location_Dictionary[(AISnakePosition.x - 45) + ":" + AISnakePosition.y] === "undefined") {
+                    AISnake.setDirection("right");
+                } else {
+                    AISnake.setDirection("left");
+                }
 
             }
-            else if (AISnakeHeadPosition.y > ApplePosition.y) {
-                AISnakeHead.setDirection("up");
+             else if (AISnakePosition.y > ApplePosition.y) {
+                if (typeof Snake_Location_Dictionary[(AISnakePosition.x) + ":" + (AISnakePosition.y - 90)] === "undefined" && typeof Snake_Location_Dictionary[(AISnakePosition.x) + ":" + (AISnakePosition.y - 45)] === "undefined") {
+                    AISnake.setDirection("down");
+
+                } else {
+                    AISnake.setDirection("up");
+                }
 
             }
-            else if (AISnakeHeadPosition.y < ApplePosition.y) {
-                AISnakeHead.setDirection("down");
+             else if (AISnakePosition.y < ApplePosition.y) {
+                if (typeof Snake_Location_Dictionary[(AISnakePosition.x) + ":" + (AISnakePosition.y + 90)] === "undefined" && typeof Snake_Location_Dictionary[(AISnakePosition.x) + ":" + (AISnakePosition.y + 45)] === "undefined") {
+                    AISnake.setDirection("up");
 
+                } else {
+                    AISnake.setDirection("down");
+                }
             }
-            
-        };
+        }
         Movement(1);
-    }, 200); // New Snake movement every 0.2 seconds (5 fps)
+    }, 200); // New AISnake movement every 0.2 seconds (5 fps)
 
+}
+
+function isValidDirection(OldDirection, NewDirection) {
+    if ((OldDirection == "up" && NewDirection == "down") || (OldDirection == "down" && NewDirection =="up" ) || (OldDirection == "left" && NewDirection == "right") || (OldDirection == "right" && NewDirection == "left")) {
+        return false;
+    }
+    else {
+        return true;
+    }
 }
 
 function AddSegment(SnakeNum) { //Adds a new body segment to a specified snake
@@ -203,16 +236,19 @@ function Movement(SnakeNum) {
         if (SnakeNum == 0) {
             Dead = 1; //Collision between segments so game is over
         }
-        else { //Otherwise, removes the AI Snake from the gameboard
-            var x = 0;
-            for (x; x < Snakes[1].length; x++) {
-                var AILocation = Snakes[1][x].getPosition();
-                delete Snake_Location_Dictionary[AILocation.x + ":" + AILocation.y];
-                Snakes[1][x].remove();
+        else { // On AI Snake collision, removes a segment, until snake has no more segments
+            TailPosition = Snakes[1][Snakes[1].length - 1].getPosition();
+            Snakes[1][Snakes[1].length - 1].remove();
+            delete Snake_Location_Dictionary[TailPosition.x + ":" + TailPosition.y];
+            Snakes[1].splice(Snakes[1].length - 1, 1);
+            Score++;
+            if (Snakes[1].length == 0) {
+                AIDead = true
             }
-        }
+        };
+    };
         
-    }
+    
 
     //Checks for collisions between snake and apples
     if (typeof Apple_Location_Dictionary[HeadPosition.x.toString() + ":" + HeadPosition.y.toString()] !== "undefined") {
@@ -222,7 +258,7 @@ function Movement(SnakeNum) {
         if (SnakeNum == 0) {
             Score++;
             document.getElementById("Score").innerHTML = "Score: " + Score.toString();
-        }
+        } 
 
     }
 
