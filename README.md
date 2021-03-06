@@ -5,3 +5,4 @@ This was a simple project I made over the course of a few hours in order to teac
 It is fully functional and is inspired by the retro versions of snake, rather than the new versions with smooth movement and fancier graphics (e.g Google Snake).
 
 Rather than dying when you reach the screen edge, you will instead be wrapped around to the approprate opposing edge. This allows for some interesting gameplay scenarios.
+I also implemented a basic CPU pathfinding system that allows you to play against another Snake.
